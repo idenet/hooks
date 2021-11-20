@@ -1,25 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import reactDom from 'react-dom'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+let state = []
+let setters = []
+let stateIndex = 0
+
+function createSetter(index) {
+  return function (newState) {
+    state[index] = newState
+    render()
+  }
 }
 
-export default App;
+function useState(initialState) {
+  state[stateIndex] = state[stateIndex] ? state[stateIndex] : initialState
+  setters.push(createSetter(stateIndex))
+  let value = state[stateIndex]
+  let setter = setters[stateIndex]
+  stateIndex++
+  return [value, setter]
+}
+
+function render() {
+  stateIndex = 0
+  reactDom.render(<App></App>, document.getElementById('root'))
+}
+
+function App() {
+  const [count, setCount] = useState(0)
+  return (
+    <div className="App">
+      <button onClick={() => setCount(count + 1)}>+1</button>
+      <span>{count}</span>
+    </div>
+  )
+}
+
+export default App
